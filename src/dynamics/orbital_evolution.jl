@@ -580,7 +580,10 @@ Base.@constprop :aggressive function orbital_evolution(
         # better estimate, though, because it's dealing with lower speeds, at which PN
         # approximation should be more accurate.
         pnsystem.state[:] .= pnsystemᵢ.state
-        pnsystem.state[vindex] = v₁
+        # NOTE this only makes sense for PN systems where v is a state
+        # variable. That's not appropriate for eccentric PN, where it would be
+        # better to use x as a state variable (or n)
+        pnsystem.state[symbol_index(typeof(pnsystem), Val(:v))] = v₁
         t₁ =
             -4 * (estimated_time_to_merger(pnsystem) - estimated_time_to_merger(pnsystemᵢ))
         if "saveat" ∈ keys(solve_kwargs) && solve_kwargs["saveat"] isa AbstractVector

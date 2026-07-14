@@ -35,20 +35,10 @@ end
     χ⃗̇₁ = (Ṡ₁ / M₁^2) * χ̂₁ - (2Ṁ₁ / M₁) * χ⃗₁ + Ω⃗ᵪ₁(pnsystem) × χ⃗₁
     χ⃗̇₂ = (Ṡ₂ / M₂^2) * χ̂₂ - (2Ṁ₂ / M₂) * χ⃗₂ + Ω⃗ᵪ₂(pnsystem) × χ⃗₂
     Ṙ = Ω⃗ * R / 2
-    u̇[M₁index] = Ṁ₁
-    u̇[M₂index] = Ṁ₂
-    u̇[χ⃗₁ˣindex] = χ⃗̇₁.x
-    u̇[χ⃗₁ʸindex] = χ⃗̇₁.y
-    u̇[χ⃗₁ᶻindex] = χ⃗̇₁.z
-    u̇[χ⃗₂ˣindex] = χ⃗̇₂.x
-    u̇[χ⃗₂ʸindex] = χ⃗̇₂.y
-    u̇[χ⃗₂ᶻindex] = χ⃗̇₂.z
-    u̇[Rʷindex] = Ṙ.w
-    u̇[Rˣindex] = Ṙ.x
-    u̇[Rʸindex] = Ṙ.y
-    u̇[Rᶻindex] = Ṙ.z
-    u̇[vindex] = v̇
-    u̇[Φindex] = Ω
+    for (sym, rhs) ∈ zip((:M₁,:M₂,:χ⃗₁ˣ,:χ⃗₁ʸ,:χ⃗₁ᶻ,:χ⃗₂ˣ,:χ⃗₂ʸ,:χ⃗₂ᶻ,:Rʷ,:Rˣ,:Rʸ,:Rᶻ,:v,:Φ),
+                         (Ṁ₁,Ṁ₂,χ⃗̇₁.x,χ⃗̇₁.y,χ⃗̇₁.z,χ⃗̇₂.x,χ⃗̇₂.y,χ⃗̇₂.z,Ṙ.w,Ṙ.x,Ṙ.y,Ṙ.z,v̇,Ω))
+        u̇[symbol_index(typeof(pnsystem), Val(sym))] = rhs
+    end
     return nothing
 end
 

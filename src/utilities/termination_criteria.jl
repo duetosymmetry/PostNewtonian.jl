@@ -14,6 +14,8 @@ function termination_forwards(vₑ, quiet=false)
     # Triggers the `continuous_terminator!` whenever one of these conditions crosses 0.
     # More precisely, the integrator performs a root find to finish precisely
     # when one of these conditions crosses 0.
+
+    # NOTE These are very specific to quasicircular; have to generalize for eccentric
     function conditions(out, state, t, integrator)
         out[1] = state[M₁index]  # Terminate if M₁ ≤ 0
         out[2] = state[M₂index]  # Terminate if M₂ ≤ 0

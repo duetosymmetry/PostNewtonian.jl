@@ -1,11 +1,11 @@
 module FundamentalVariables
 
 using ..PostNewtonian
-using ..PostNewtonian: PNSystem, BHNS, NSNS, FDPNSystem
+using ..PostNewtonian: PNSystem, BBH, BHNS, NSNS, FDPNSystem, symbols
 using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic: Quaternionic, QuatVec, Rotor
 
-export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂, M1, M2, chi1, chi2, Phi, Lambda1, Lambda2
+export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂, M1, M2, chi1, chi2, Phi, Lambda1, Lambda2, symbol_index
 
 ## NOTE:
 ## This indices used below are intimately bound to choices made in the definitions of
@@ -17,8 +17,9 @@ export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂, M1, M2, chi1, chi
 
 Mass of object 1 in this system.
 """
-M₁(s::PNSystem) = M₁(s.state)
-M₁(state::AbstractVector) = @inbounds state[M₁index]
+function M₁(::T) where {T<:PNSystem}
+    error("M₁ is not (yet) defined for PNSystem subtype `$T`.")
+end
 const M1 = M₁
 
 """
@@ -27,8 +28,9 @@ const M1 = M₁
 
 Mass of object 2 in this system.
 """
-M₂(s::PNSystem) = M₂(s.state)
-M₂(state::AbstractVector) = @inbounds state[M₂index]
+function M₂(::T) where {T<:PNSystem}
+    error("M₂ is not (yet) defined for PNSystem subtype `$T`.")
+end
 const M2 = M₂
 
 """
@@ -89,8 +91,9 @@ as a keyword argument — as in `v(Ω=0.1)`.
 
 See also [`Ω`](@ref).
 """
-#v(s::PNSystem) = v(s.state)
-#v(state::AbstractVector) = @inbounds state[vindex]
+function v(::T) where {T<:PNSystem}
+    error("v is not (yet) defined for PNSystem subtype `$T`.")
+end
 v(; Ω, M=1) = ∛(M * Ω)
 
 """
@@ -99,8 +102,9 @@ v(; Ω, M=1) = ∛(M * Ω)
 
 Integrated orbital phase of the system.  It is computed as the integral of [`Ω`](@ref).
 """
-Φ(s::PNSystem) = Φ(s.state)
-Φ(state::AbstractVector) = @inbounds state[Φindex]
+function Φ(::T) where {T<:PNSystem}
+    error("Φ is not (yet) defined for PNSystem subtype `$T`.")
+end
 const Phi = Φ
 
 @doc raw"""
@@ -135,8 +139,6 @@ safe and efficient to use this quantity in any PN expression that specializes on
 See also [`Λ₂`](@ref) and [`Λ̃`](@ref).
 """
 Λ₁(pn::PNSystem) = zero(eltype(pn))
-#Λ₁(pn::NSNS) = pn.Λ₁
-#Λ₁(pn::FDPNSystem) = pn.Λ₁
 const Lambda1 = Λ₁
 
 @doc raw"""
@@ -155,9 +157,22 @@ specializes on the type of `pnsystem`.
 See also [`Λ₁`](@ref) and [`Λ̃`](@ref).
 """
 Λ₂(pn::PNSystem) = zero(eltype(pn))
-#Λ₂(pn::BHNS) = pn.Λ₂
-#Λ₂(pn::NSNS) = pn.Λ₂
-#Λ₂(pn::FDPNSystem) = pn.Λ₂
 const Lambda2 = Λ₂
+
+############################################################
+# TODO This got moved here out of pn_systems.jl
+for PNT ∈ (BBH, BHNS, BNS)
+    for (i, symbol) ∈ enumerate(symbols(PNT))
+        # This will define, e.g., `M₁(pnsystem::BBH) = pnsystem.state[1]`.  We
+        # could do this manually, but this is more concise and less error-prone.
+        @eval PostNewtonian.FundamentalVariables begin
+            $(symbol)(pnsystem::$PNT) = @inbounds pnsystem.state[$i]
+            $(symbol)(pnsystem::FDPNSystem{NT,$PNT{NT,ST,PNOrder},PNOrder}) where {NT,ST,PNOrder} = @inbounds pnsystem.state[$i]
+            function symbol_index(::Type{T}, ::Val{Symbol($symbol)}) where {T<:$PNT}
+                $i
+            end
+        end
+    end
+end
 
 end
