@@ -85,17 +85,17 @@ end
 
 function default_termination_criteria_forwards(pnsystem, vₑ, quiet)
     return CallbackSet(
-        termination_forwards(vₑ, quiet),
-        dtmin_terminator(eltype(pnsystem), quiet),
-        decreasing_v_terminator(quiet),
+        termination_forwards(pnsystem, vₑ, quiet),
+        dtmin_terminator(pnsystem, eltype(pnsystem), quiet),
+        decreasing_v_terminator(pnsystem, quiet),
         nonfinite_terminator(),
     )
 end
 
 function default_termination_criteria_backwards(pnsystem, v₁, quiet)
     return CallbackSet(
-        termination_backwards(v₁, quiet),
-        dtmin_terminator(eltype(pnsystem), quiet),
+        termination_backwards(pnsystem, v₁, quiet),
+        dtmin_terminator(pnsystem, eltype(pnsystem), quiet),
         nonfinite_terminator(),
     )
 end
@@ -397,16 +397,6 @@ Base.@constprop :aggressive function orbital_evolution(
 )
     # Sanity checks for the inputs
 
-    RHS! = if approximant == "TaylorT1"
-        TaylorT1RHS!
-    elseif approximant == "TaylorT4"
-        TaylorT4RHS!
-    elseif approximant == "TaylorT5"
-        TaylorT5RHS!
-    else
-        error("Approximant `$approximant` is not currently supported")
-    end
-
     if M₁ ≤ 0 || M₂ ≤ 0
         error("Unphysical masses: M₁=$M₁, M₂=$M₂.")
     end
@@ -473,6 +463,16 @@ Base.@constprop :aggressive function orbital_evolution(
         else
             BBH(; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, PNOrder)
         end
+    end
+
+    RHS! = if approximant == "TaylorT1"
+        TaylorT1RHS(typeof(pnsystem))
+    elseif approximant == "TaylorT4"
+        TaylorT4RHS(typeof(pnsystem))
+    elseif approximant == "TaylorT5"
+        TaylorT5RHS(typeof(pnsystem))
+    else
+        error("Approximant `$approximant` is not currently supported")
     end
 
     if isnothing(termination_criteria_forwards)
