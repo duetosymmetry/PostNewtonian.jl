@@ -42,7 +42,7 @@ Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 χ⃗₁(pnsystem::T) where {T<:PNSystem} = χ⃗₁(T, pnsystem.state)
 
 function χ⃗₁(::Type{T}, state::AbstractVector) where {T<:PNSystem}
-    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₁ˣ))], state[symbol_index(T, Val(:χ⃗₁ʸ))], state[symbol_index(T, Val( :χ⃗₁ᶻ))])
+    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₁ˣ)) : symbol_index(T, Val(:χ⃗₁ᶻ))])
 end
 
 const chi1 = χ⃗₁
@@ -56,7 +56,7 @@ Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 χ⃗₂(pnsystem::T) where {T<:PNSystem} = χ⃗₂(T, pnsystem.state)
 
 function χ⃗₂(::Type{T}, state::AbstractVector) where {T<:PNSystem}
-    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₂ˣ))], state[symbol_index(T, Val(:χ⃗₂ʸ))], state[symbol_index(T, Val( :χ⃗₂ᶻ))])
+    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₂ˣ)) : symbol_index(T, Val(:χ⃗₂ᶻ))])
 end
 
 const chi2 = χ⃗₂
@@ -84,15 +84,9 @@ R(pnsystem::T) where {T<:PNSystem} = R(T, pnsystem.state)
 
 function R(::Type{T}, state::AbstractVector) where{T<:PNSystem}
     @inbounds Rotor(
-        state[symbol_index(T, Val(:Rʷ))],
-        state[symbol_index(T, Val(:Rˣ))],
-        state[symbol_index(T, Val(:Rʸ))],
-        state[symbol_index(T, Val(:Rᶻ))],
+        state[symbol_index(T, Val(:Rʷ)):symbol_index(T, Val(:Rᶻ))]
     )
 end
-
-# R(state::AbstractVector) = @inbounds Rotor(view(state, Rindices)...)
-
 
 @doc raw"""
     v(pnsystem)

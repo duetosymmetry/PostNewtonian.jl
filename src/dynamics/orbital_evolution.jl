@@ -69,10 +69,10 @@ fairly reliably.
 See also the `saves_per_orbit` and `saveat` arguments to [`orbital_evolution`](@ref), as
 well as interpolation-in-time capabilities of the result of that function.
 """
-function uniform_in_phase(solution, saves_per_orbit)
+function uniform_in_phase(PNType, solution, saves_per_orbit)
     let π = eltype(solution)(π)
         t = solution.t
-        Φ = solution[:Φ]
+        Φ = solution[symbol_index(PNType, Val(:Φ))]
         δΦ = 2π / saves_per_orbit
         Φrange = range(extrema(Φ)...; step=δΦ)
         t_Φ = CubicSpline(t, Φ)(Φrange)
@@ -85,16 +85,16 @@ end
 
 function default_termination_criteria_forwards(pnsystem, vₑ, quiet)
     return CallbackSet(
-        termination_forwards(pnsystem, vₑ, quiet),
-        dtmin_terminator(pnsystem, eltype(pnsystem), quiet),
-        decreasing_v_terminator(pnsystem, quiet),
+        termination_forwards(typeof(pnsystem), vₑ, quiet),
+        dtmin_terminator(typeof(pnsystem), eltype(pnsystem), quiet),
+        decreasing_v_terminator(typeof(pnsystem), quiet),
         nonfinite_terminator(),
     )
 end
 
 function default_termination_criteria_backwards(pnsystem, v₁, quiet)
     return CallbackSet(
-        termination_backwards(pnsystem, v₁, quiet),
+        termination_backwards(typeof(pnsystem), v₁, quiet),
         dtmin_terminator(pnsystem, eltype(pnsystem), quiet),
         nonfinite_terminator(),
     )
@@ -612,7 +612,7 @@ Base.@constprop :aggressive function orbital_evolution(
     end
 
     if saves_per_orbit > 0
-        solution = uniform_in_phase(solution, saves_per_orbit)
+        solution = uniform_in_phase(typeof(pnsystem), solution, saves_per_orbit)
     end
 
     return solution
