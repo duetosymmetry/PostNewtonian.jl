@@ -42,7 +42,11 @@ end
     return nothing
 end
 
-sys = SymbolCache(collect(pnsystem_symbols), nothing, :t)
+const QuasisphericalSystem = Union{BBH, BHNS, NSNS}
+
+function symbol_cache(::Type{pnsystem}) where {pnsystem<:PNSystem}
+    SymbolCache(collect(symbols(pnsystem)), nothing, :t)
+end
 
 @doc raw"""
     TaylorT1!(u̇, pnsystem)
@@ -70,7 +74,8 @@ TaylorT1!(u̇, u, p, t) = (p.state.=u; TaylorT1!(u̇, p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT1!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT1RHS! = ODEFunction{true,FullSpecialize}(TaylorT1!; sys)
+TaylorT1RHS(::Type{pnsystem}) where {pnsystem<:QuasisphericalSystem} =
+    ODEFunction{true,FullSpecialize}(TaylorT1!; sys=symbol_cache(pnsystem))
 
 @doc raw"""
     TaylorT4!(u̇, pnsystem)
@@ -109,7 +114,8 @@ TaylorT4!(u̇, u, p, t) = (p.state.=u; TaylorT4!(u̇, p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT4!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT4RHS! = ODEFunction{true,FullSpecialize}(TaylorT4!; sys)
+TaylorT4RHS(::Type{pnsystem}) where {pnsystem<:QuasisphericalSystem} =
+    ODEFunction{true,FullSpecialize}(TaylorT4!; sys=symbol_cache(pnsystem))
 
 @doc raw"""
     TaylorT5!(u̇, pnsystem)
@@ -140,4 +146,5 @@ TaylorT5!(u̇, u, p, t) = (p.state.=u; TaylorT5!(u̇, p))
 A `SciMLBase.ODEFunction` wrapper for [`TaylorT5!`](@ref), suitable for passing into
 `OrdinaryDiffEq.solve`.
 """
-const TaylorT5RHS! = ODEFunction{true,FullSpecialize}(TaylorT5!; sys)
+TaylorT5RHS(::Type{pnsystem}) where {pnsystem<:QuasisphericalSystem} =
+    ODEFunction{true,FullSpecialize}(TaylorT5!; sys=symbol_cache(pnsystem))
