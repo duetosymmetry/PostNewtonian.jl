@@ -16,13 +16,16 @@ struct BBH{NT,ST<:DenseVector{NT},PNOrder} <: PNSystem{NT,ST,PNOrder}
 
     BBH{NT,ST,PNOrder}(state) where {NT,ST,PNOrder} = new{NT,ST,PNOrder}(state)
 
-    function BBH(; PNOrder=typemax(Int), kwargs...)
+    function BBH(; PNOrder=max_pn_order, kwargs...)
         (NT, ST, PNOrder, state) = prepare_system(BBH; PNOrder=PNOrder, kwargs...)
         return new{NT,ST,PNOrder}(state)
     end
-
+    function BBH(state; PNOrder=max_pn_order)
+        @assert length(state) == 14
+        return new{eltype(state),typeof(state),prepare_pn_order(PNOrder)}(state)
+    end
 end
-# const BHBH = BBH
+const BHBH = BBH
 
 function pack_state(::Type{<:BBH}; M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ=0)
     [M₁; M₂; vec(QuatVec(χ⃗₁)); vec(QuatVec(χ⃗₂)); components(Rotor(R)); v; Φ]

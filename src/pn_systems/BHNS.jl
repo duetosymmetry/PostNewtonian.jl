@@ -17,6 +17,10 @@ struct BHNS{NT,ST<:DenseVector{NT},PNOrder} <: PNSystem{NT,ST,PNOrder}
         (NT, ST, PNOrder, state) = prepare_system(BHNS; PNOrder=PNOrder, kwargs...)
         return new{NT,ST,PNOrder}(state)
     end
+    function BHNS(state; PNOrder=max_pn_order)
+        @assert length(state) == 15
+        return new{eltype(state),typeof(state),prepare_pn_order(PNOrder)}(state)
+    end
 end
 
 # The following are methods of functions defined in `state_variables.jl`,

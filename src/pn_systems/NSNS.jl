@@ -15,7 +15,10 @@ struct NSNS{NT,ST<:DenseVector{NT},PNOrder} <: PNSystem{NT,ST,PNOrder}
         (NT, ST, PNOrder, state) = prepare_system(NSNS; PNOrder=PNOrder, kwargs...)
         return new{NT,ST,PNOrder}(state)
     end
-
+    function NSNS(state; PNOrder=max_pn_order)
+        @assert length(state) == 16
+        return new{eltype(state),typeof(state),prepare_pn_order(PNOrder)}(state)
+    end
 end
 
 const BNS = NSNS

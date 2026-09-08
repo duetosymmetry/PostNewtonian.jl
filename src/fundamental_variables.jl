@@ -39,11 +39,7 @@ const M2 = M₂
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
-χ⃗₁(pnsystem::T) where {T<:PNSystem} = χ⃗₁(T, pnsystem.state)
-
-function χ⃗₁(::Type{T}, state::AbstractVector) where {T<:PNSystem}
-    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₁ˣ)) : symbol_index(T, Val(:χ⃗₁ᶻ))])
-end
+χ⃗₁(s::T) where {T<:PNSystem} = @inbounds QuatVec(s.state[symbol_index(T, Val(:χ⃗₁ˣ)) : symbol_index(T, Val(:χ⃗₁ᶻ))])
 
 const chi1 = χ⃗₁
 
@@ -53,11 +49,7 @@ const chi1 = χ⃗₁
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
-χ⃗₂(pnsystem::T) where {T<:PNSystem} = χ⃗₂(T, pnsystem.state)
-
-function χ⃗₂(::Type{T}, state::AbstractVector) where {T<:PNSystem}
-    @inbounds QuatVec(state[symbol_index(T, Val(:χ⃗₂ˣ)) : symbol_index(T, Val(:χ⃗₂ᶻ))])
-end
+χ⃗₂(s::T) where {T<:PNSystem} = @inbounds QuatVec(s.state[symbol_index(T, Val(:χ⃗₂ˣ)) : symbol_index(T, Val(:χ⃗₂ᶻ))])
 
 const chi2 = χ⃗₂
 
@@ -80,13 +72,7 @@ and ``ϖ`` is the precession angular frequency.
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
 PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
 """
-R(pnsystem::T) where {T<:PNSystem} = R(T, pnsystem.state)
-
-function R(::Type{T}, state::AbstractVector) where{T<:PNSystem}
-    @inbounds Rotor(
-        state[symbol_index(T, Val(:Rʷ)):symbol_index(T, Val(:Rᶻ))]
-    )
-end
+R(s::T) where {T<:PNSystem} = @inbounds Rotor(s.state[symbol_index(T, Val(:Rʷ)):symbol_index(T, Val(:Rᶻ))])
 
 @doc raw"""
     v(pnsystem)

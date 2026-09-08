@@ -53,13 +53,6 @@ function ΩISCO(pnsystem)
     return 2eltype(pnsystem)(π) * fISCO(pnsystem)
 end
 
-"""
-Helper function to get the PNSystem type information from the ODEProblem.
-"""
-function get_ODE_prob_P(::Type{ODEProblem{uType, tType, isinplace, P, F, K, PT}}) where {uType, tType, isinplace, P, F, K, PT}
-         return P
-       end
-
 @doc raw"""
     uniform_in_phase(solution, saves_per_orbit)
 
@@ -79,7 +72,7 @@ well as interpolation-in-time capabilities of the result of that function.
 function uniform_in_phase(solution, saves_per_orbit)
     let π = eltype(solution)(π)
         t = solution.t
-        PNType = get_ODE_prob_P(typeof(solution.prob))
+        PNType = typeof(solution.prob.p)
         Φ = solution[symbol_index(PNType, Val(:Φ)), :]
         δΦ = 2π / saves_per_orbit
         Φrange = range(extrema(Φ)...; step=δΦ)
@@ -620,7 +613,7 @@ Base.@constprop :aggressive function orbital_evolution(
     end
 
     if saves_per_orbit > 0
-        solution = uniform_in_phase(typeof(pnsystem), solution, saves_per_orbit)
+        solution = uniform_in_phase(solution, saves_per_orbit)
     end
 
     return solution

@@ -51,7 +51,7 @@ export termination_forwards,
 using .MathConstants
 
 include("pn_systems/BBH.jl")
-export BBH
+export BBH, BHBH
 
 include("pn_systems/FDPNSystem.jl")
 export FDPNSystem, fd_pnsystem
