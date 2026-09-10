@@ -27,7 +27,8 @@ function coorbital_waveform_computation_storage(
     @assert ℓₘᵢₙ ≤ ℓₘₐₓ
     p = _pnsystem(inspiral)
     PNSystemType = parameterless_type(p)
-    pnsystem = PNSystemType(copy(inspiral.u[1]); Λ₁=Λ₁(p), Λ₂=Λ₂(p), PNOrder)
+    pnsystem = PNSystemType{eltype(inspiral), eltype(inspiral.u), PNOrder}(copy(inspiral.u[1]))
+    # pnsystem = PNSystemType(copy(inspiral.u[1]); Λ₁=Λ₁(p), Λ₂=Λ₂(p), PNOrder)
     n_modes = (ℓₘₐₓ + 1)^2 - ℓₘᵢₙ^2
     h = Array{Complex{eltype(inspiral)}}(undef, n_modes, length(inspiral))
     return h, pnsystem

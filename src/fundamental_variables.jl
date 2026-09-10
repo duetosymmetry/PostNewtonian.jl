@@ -2,7 +2,7 @@ module FundamentalVariables
 
 using ..PostNewtonian
 using ..PostNewtonian: PNSystem, BBH, BHNS, NSNS, FDPNSystem, symbols
-using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
+# using ..PostNewtonian: M₁index, M₂index, χ⃗₁indices, χ⃗₂indices, Rindices, vindex, Φindex
 using Quaternionic: Quaternionic, QuatVec, Rotor
 
 export M₁, M₂, χ⃗₁, χ⃗₂, R, v, Φ, Λ₁, Λ₂, M1, M2, chi1, chi2, Phi, Lambda1, Lambda2, symbol_index
@@ -39,8 +39,8 @@ const M2 = M₂
 
 Dimensionless spin vector of object 1 in this system, as a `QuatVec`.
 """
-χ⃗₁(s::PNSystem) = χ⃗₁(s.state)
-χ⃗₁(state::AbstractVector) = @inbounds QuatVec(view(state, χ⃗₁indices)...)
+χ⃗₁(s::T) where {T<:PNSystem} = @inbounds QuatVec(s.state[symbol_index(T, Val(:χ⃗₁ˣ)) : symbol_index(T, Val(:χ⃗₁ᶻ))])
+
 const chi1 = χ⃗₁
 
 """
@@ -49,8 +49,8 @@ const chi1 = χ⃗₁
 
 Dimensionless spin vector of object 2 in this system, as a `QuatVec`.
 """
-χ⃗₂(s::PNSystem) = χ⃗₂(s.state)
-χ⃗₂(state::AbstractVector) = @inbounds QuatVec(view(state, χ⃗₂indices)...)
+χ⃗₂(s::T) where {T<:PNSystem} = @inbounds QuatVec(s.state[symbol_index(T, Val(:χ⃗₂ˣ)) : symbol_index(T, Val(:χ⃗₂ᶻ))])
+
 const chi2 = χ⃗₂
 
 """
@@ -72,8 +72,7 @@ and ``ϖ`` is the precession angular frequency.
 See also [`n̂`](@ref PostNewtonian.n̂), [`λ̂`](@ref PostNewtonian.λ̂), [`ℓ̂`](@ref
 PostNewtonian.ℓ̂), [`Ω`](@ref PostNewtonian.Ω), and [`𝛡`](@ref PostNewtonian.𝛡)``=ϖ n̂``.
 """
-R(s::PNSystem) = R(s.state)
-R(state::AbstractVector) = @inbounds Rotor(view(state, Rindices)...)
+R(s::T) where {T<:PNSystem} = @inbounds Rotor(s.state[symbol_index(T, Val(:Rʷ)):symbol_index(T, Val(:Rᶻ))])
 
 @doc raw"""
     v(pnsystem)
@@ -169,6 +168,9 @@ for PNT ∈ (BBH, BHNS, BNS)
             $(symbol)(pnsystem::$PNT) = @inbounds pnsystem.state[$i]
             $(symbol)(pnsystem::FDPNSystem{NT,$PNT{NT,ST,PNOrder},PNOrder}) where {NT,ST,PNOrder} = @inbounds pnsystem.state[$i]
             function symbol_index(::Type{T}, ::Val{Symbol($symbol)}) where {T<:$PNT}
+                $i
+            end
+            function symbol_index(::Type{FDPNSystem{NT,$PNT{NT,ST,PNOrder},PNOrder}}, ::Val{Symbol($symbol)}) where {NT,ST,PNOrder}
                 $i
             end
         end
