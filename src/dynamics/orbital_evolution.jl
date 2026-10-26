@@ -115,6 +115,13 @@ function default_abstol(pnsystem)
 end
 
 """
+## RHSDefault
+Generate the default RHS of the ODEProblem depending on the PNSystem.
+"""
+RHSDefault(pnsystem::PNSystem) = RHSDefault(typeof(pnsystem))
+RHSDefault(PNType::Type{<:QuasisphericalSystem}) = TaylorT1RHS(PNType)
+
+"""
     orbital_evolution(pnsystem; kwargs...)
     orbital_evolution(M₁, M₂, χ⃗₁, χ⃗₂, Ωᵢ; kwargs...)
 
@@ -519,7 +526,7 @@ end
 
 Base.@constprop :aggressive function orbital_evolution(
     pnsystemᵢ;
-    (RHS!)=(TaylorT1RHS(typeof(pnsystemᵢ))),
+    (RHS!)=(RHSDefault(pnsystemᵢ)),
     v₁=zero(pnsystemᵢ),
     vₑ=one(pnsystemᵢ),
     check_up_down_instability=true,
